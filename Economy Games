@@ -1,0 +1,134 @@
+import discord
+from discord.ext import commands
+from bs4 import BeautifulSoup
+import requests
+import random
+import asyncio
+
+client = commands.Bot(command_prefix = "!")
+url = "https://www.sacnilk.com/entertainmenttopbar/Top_500_Bollywood_Movies_Of_All_Time"
+
+r = requests.get(url)
+htmlContent = r.content
+soup = BeautifulSoup(htmlContent , 'html.parser')
+
+tgs = []
+for tag in soup.find_all('a'):
+    tgs.append(tag.text)
+
+bollywood_movies = tgs[45:1045]
+
+
+gifs = ["https://i.pinimg.com/originals/09/9a/57/099a57d2fe430ea56cdc5ed4979ff909.gif",
+		"https://i.pinimg.com/originals/9b/da/90/9bda90c406615bfb08c1deee5eac12f0.gif",
+		"https://i.pinimg.com/originals/5a/4b/42/5a4b42b5f67ad5ff2ee40e05b9f6791b.gif",
+		"https://i.pinimg.com/originals/74/51/d6/7451d6db75d6ee321bfc88dcba21d157.gif",
+		"https://i.pinimg.com/originals/fe/0e/21/fe0e21af0db0b29c33a866d16b7e5392.gif",
+		"https://pa1.narvii.com/6085/f1c0e054e6cf2215ee577b19b49f0ff575eccd6f_hq.gif",
+		"https://thumbs.gfycat.com/TightDeliciousCurassow-size_restricted.gif",
+		"https://c.tenor.com/P7VCJlbT_bAAAAAC/anime-pink.gif",
+		"https://c.tenor.com/-hvLFXU487AAAAAC/anime-pink.gif",
+		"https://i.pinimg.com/originals/94/fa/4b/94fa4b126901a1a2b79951f0a62d6a6c.gif",
+		"https://media0.giphy.com/media/GEkAU4EckSumA/200.gif?cid=95b279446d9d7ba976690f7ce405d6f4785e967a75f2ba75&rid=200.gif&ct=g",
+		"https://c.tenor.com/cQAPfeSNRlYAAAAC/aesthetic-japan.gif",
+		"https://thumbs.gfycat.com/IllfatedGreenBison-size_restricted.gif",
+		"https://data.whicdn.com/images/354225933/original.gif",
+		"https://data.whicdn.com/images/350786973/original.gif",
+		"https://i.pinimg.com/originals/f5/6c/8b/f56c8bcf538d1ed7ee1a959f4a643173.gif",
+		"https://data.whicdn.com/images/355689898/original.gif"]
+
+rules = "1. Enter any alphabet as a Guess for the given Movie \n\
+2. Guesses should be of Single Character \n\
+3. There's a time limit of 60 seconds for Each Guess \n\
+4. You get 15 chances to guess the movie \n\
+5. If you are able to Guess it correctly , You get Currency between $(500-1000)\n\
+6. Unsuccessfull attempts will cost you $100"
+
+@client.event
+async def on_ready():
+	print(f"{client.user.name} is ready!") 
+
+class Game:
+	@client.command()
+	async def work(ctx):
+		Movie = random.choice(bollywood_movies)
+		Guess = []
+		for index in range(len(Movie)):
+			try:
+				if Movie[index].isalpha() and Movie[index].lower() not in "aeiou":
+					Guess.append(" _ ")
+				elif Movie[index].isdigit():
+					Guess.append(" _ ")
+				else:
+					Guess.append(Movie[index])
+			except Movie[index].isspace():
+				Guess.append(" | ")
+
+
+		seperator = " "
+		Guess = (seperator.join(Guess))
+
+		digit_count , alpha_count = 0 , 0
+
+		for count in range(len(Movie)):
+			if Movie[count].isdigit():
+				digit_count += 1
+			elif Movie[count].isalpha():
+				alpha_count += 1
+		thumbnail = random.choice(gifs)
+
+		em = discord.Embed(
+			title = "Guess the Movie",
+			description = f"```{Guess}```",
+			color = discord.Color.red()
+			)
+		em.add_field(
+			name = "Rules : ",
+			value = f"```{rules}```")
+		em.add_field(
+			name = "Movie Details : ",
+			value = f"Alphabet Count : {alpha_count} \n Digit Count : {digit_count}",
+			inline = False
+			)
+		em.set_image(url = thumbnail)
+		await ctx.send(embed = em)
+
+		for chance in range(15):
+			print(Guess)
+			try:
+				message = await client.wait_for("message" , check = lambda m: m.author == ctx.author and m.channel == ctx.channel, timeout = 60.0)
+				await ctx.channel.purge(limit = 2)
+				if message.content.lower() in Movie.lower():
+					found = "Yes"
+					for replace in range(len(Movie)):
+						if message.content.lower() == Movie[replace].lower():
+							Guess[replace*2] == Movie[replace]
+				else:
+					found = "No"
+					await ctx.channel.purge(limit=2)
+
+			except asyncio.TimeoutError:
+				await ctx.channel.purge(limit = 1)
+				await ctx.channel.send("You ran out of time")
+				break
+
+			em = discord.Embed(
+				title = "Guess the Movie",
+				description = f"```{Guess}```",
+				color = discord.Color.red()
+				)
+			em.add_field(
+				name = "Rules : ",
+				value = f"```{rules}```")
+			em.add_field(
+				name = "Movie Details : ",
+				value = f"Alphabet Count : {alpha_count} \n Digit Count : {digit_count} \n {message.content.upper()} in Movie : {found}",
+				inline = False
+				)
+			em.set_image(url = thumbnail)
+			await ctx.send(embed=em)
+
+
+
+
+client.run('OTMzMTk0NjI3ODk1NDE0ODA0.Yed_OQ.GQEsS3WG9la3tQCkmW8o3xgy5w8')
