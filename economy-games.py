@@ -59,8 +59,8 @@ async def on_ready():
 def rules_embed():
 	thumbnail = random.choice(gifs)
 	embed = discord.Embed(
-			title = "Guess the Movie",
-			color = discord.Color.red()
+		title = "Guess the Movie",
+		color = discord.Color.red()
 	)
 	embed.add_field(
 		name = "Rules : ",
