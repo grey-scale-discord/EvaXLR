@@ -3,6 +3,7 @@ from discord.ext import commands
 from bs4 import BeautifulSoup
 import requests
 import random
+import json
 import asyncio
 
 client = commands.Bot(command_prefix = "!")
@@ -40,7 +41,7 @@ gifs = ["https://i.pinimg.com/originals/09/9a/57/099a57d2fe430ea56cdc5ed4979ff90
 rules = "1. Enter any alphabet as a Guess for the given Movie \n\
 2. Guesses should be of Single Character \n\
 3. There's a time limit of 60 seconds for Each Guess \n\
-4. You get 15 chances to guess the movie \n\
+4. You get 9 chances to guess the movie \n\
 5. If you are able to Guess it correctly , You get Currency between $(500-1000)\n\
 6. Unsuccessfull attempts will cost you $100"
 
@@ -56,17 +57,17 @@ class Game:
 		for index in range(len(Movie)):
 			try:
 				if Movie[index].isalpha() and Movie[index].lower() not in "aeiou":
-					Guess.append(" _ ")
+					Guess.append("_" )
 				elif Movie[index].isdigit():
-					Guess.append(" _ ")
+					Guess.append("_")
 				else:
 					Guess.append(Movie[index])
 			except Movie[index].isspace():
-				Guess.append(" | ")
+				Guess.append("|")
 
 
 		seperator = " "
-		Guess = (seperator.join(Guess))
+		display = (seperator.join(Guess))
 
 		digit_count , alpha_count = 0 , 0
 
@@ -79,7 +80,7 @@ class Game:
 
 		em = discord.Embed(
 			title = "Guess the Movie",
-			description = f"```{Guess}```",
+			description = f"```{display}```",
 			color = discord.Color.red()
 			)
 		em.add_field(
@@ -93,28 +94,48 @@ class Game:
 		em.set_image(url = thumbnail)
 		await ctx.send(embed = em)
 
-		for chance in range(15):
-			print(Guess)
+		movie_list = list(Movie)
+		attempted = []
+
+		error = 9
+		while error>0:
 			try:
 				message = await client.wait_for("message" , check = lambda m: m.author == ctx.author and m.channel == ctx.channel, timeout = 60.0)
+				attempted.append(message.content)
+
 				await ctx.channel.purge(limit = 2)
+
+				if message.content == "!exit":
+					error = 0
+
 				if message.content.lower() in Movie.lower():
 					found = "Yes"
 					for replace in range(len(Movie)):
 						if message.content.lower() == Movie[replace].lower():
-							Guess[replace*2] == Movie[replace]
+							Guess[replace] = movie_list[replace]
+							display = seperator.join(Guess)
+							
 				else:
 					found = "No"
+					error -= 1
 					await ctx.channel.purge(limit=2)
 
 			except asyncio.TimeoutError:
 				await ctx.channel.purge(limit = 1)
 				await ctx.channel.send("You ran out of time")
 				break
+			display_2 = seperator.join(attempted)
+			if Guess == movie_list:
+				em = discord.Embed(
+					description = f" ::dollar: | Congratulation! You won",
+					color = discord.Color.green()
+					)
+				await ctx.send(embed = em)
+				break
 
 			em = discord.Embed(
 				title = "Guess the Movie",
-				description = f"```{Guess}```",
+				description = f"```{display}```",
 				color = discord.Color.red()
 				)
 			em.add_field(
@@ -122,12 +143,25 @@ class Game:
 				value = f"```{rules}```")
 			em.add_field(
 				name = "Movie Details : ",
-				value = f"Alphabet Count : {alpha_count} \n Digit Count : {digit_count} \n {message.content.upper()} in Movie : {found}",
+				value = f"Alphabet Count : {alpha_count} \n Digit Count : {digit_count} \n {message.content.upper()} in Movie : {found} \n Attempts Left : {error}",
 				inline = False
+				)
+			em.add_field(
+				name = "Entries",
+				value = display_2,
+				inline = True
 				)
 			em.set_image(url = thumbnail)
 			await ctx.send(embed=em)
+			print(display , movie_list)
 
+		if Guess != movie_list:
+			await ctx.channel.purge(limit = 1)
+			em = discord.Embed(
+				description = f" :x: | You lost!",
+				color = discord.Color.red()
+				)
+			await ctx.send(embed = em)
 
 
 
