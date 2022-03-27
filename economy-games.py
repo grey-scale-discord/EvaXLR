@@ -1,4 +1,3 @@
-import email
 import discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
@@ -70,8 +69,9 @@ def rules_embed():
 	return embed
 
 def guess_movie_embed(guess_movie, chances_left, is_wrong = False, is_correct = False):
-	guess_movie_name = "".join([ char if guess_movie[char] != "blank" else " _ " for char in guess_movie ])
-	actual_movie_name = "".join(guess_movie.keys())
+	guess_movie_name = "".join([ char["char"] if not char["is_blank"] else "_" for char in guess_movie ])
+	actual_movie_name = "".join([ char["char"] for char in guess_movie ])
+
 
 	digit_count = 0
 	alpha_count = 0
@@ -114,45 +114,76 @@ class Game:
 
 		# Setting up the game
 		movie = random.choice(bollywood_movies).lower()
-		guess_movie = dict(
-			(char, "blank") if random.randint(0, 1) and char != " "  else 
-			(char, "not_blank")
+
+		vowel = ["a", "e", "i", "o", "u"]
+		guess_movie = [
+			{"char": char, "is_blank": True} if not char in vowel and char != " " else
+			{"char": char, "is_blank": False}
 				for char in movie
-		) 
+		]
 
 		# Starting the game
 		total_chances = 15
+		is_win = False
 
 		await ctx.send(embed = guess_movie_embed(guess_movie, total_chances))
-		total_chances -= 1
 
-		for chances in range(total_chances):
-			chances_left = total_chances - chances
-
+		while True:
 			try:
-				guess = await client.wait_for(
+				guess_letter = await client.wait_for(
 					"message" , 
 					check = lambda m: m.author == ctx.author and m.channel == ctx.channel, 
 					timeout = 60.0
 				)
-				guess = guess.content.lower()
+				guess_letter = guess_letter.content.lower()
 
 				# Checking if the attempt is correct
-				if guess in guess_movie and guess_movie[guess] == "blank":
-					guess_movie[guess] = "not_blank"
-					await ctx.send(embed = guess_movie_embed(guess_movie, chances_left, is_correct = True))
+				is_correct = False
+				value_index = 0
+				for char in guess_movie:
+					if guess_letter == char["char"] and char["is_blank"]:
+						guess_movie[value_index]["is_blank"] = False
+						is_correct = True
+						break
+					value_index += 1
+
+				if is_correct:
+					await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_correct = True))
+					
+					# Is game won?
+					if all(not char["is_blank"] for char in guess_movie):
+						await ctx.send(f"You won the game! The movie was {movie}")
+						is_win = True
+						break
+					
 					continue
 
 				# Is exit command
-				if guess in ["exit", "quit", "stop", "end", "$exit"]:
+				if guess_letter in ["exit", "quit", "stop", "end", "$exit"]:
 					await ctx.send("Let's play again next time!")
 					break
+
+				# Is chances over?
+				if total_chances <= 0:
+					await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_wrong = True))
+					await ctx.send(f"You lost the game! The movie was {movie}")
+					break
+
+				# Is single character?
+				if len(guess_letter) != 1:
+					await ctx.send("Enter a single character!")
+					continue
 				
-				await ctx.send(embed = guess_movie_embed(guess_movie, chances_left, is_wrong = True))
+				# Wrong Guess
+				total_chances -= 1
+				await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_wrong = True))
 
 			except asyncio.TimeoutError:
 				await ctx.send("Time's up!")
 				break
+		
+		if not is_win:
+			await ctx.send("Better luck next time!")
 
 
 TOKEN = os.environ.get("TOKEN")
