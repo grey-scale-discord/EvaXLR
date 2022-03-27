@@ -17,6 +17,7 @@ bot = commands.Bot(
 category_list = [
     "economy",
     "moderation",
+    "tic tac toe'
 ]
 cog_manager = CogManager(bot, category_list)
 cog_manager.load_all()
