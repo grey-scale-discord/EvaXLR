@@ -43,13 +43,13 @@ class Greetings(commands.Cog):
         )
 
         embed.add_field(
-			name = "Players",
-			value = f"{player_one.mention} is **white** \n {player_two.mention} is **black**",
+            name = "Players",
+            value = f"{player_one.mention} is **white** \n {player_two.mention} is **black**",
         )
 
         embed.add_field(
-			name = "Current Turn",
-			value = current_player.mention,
+            name = "Current Turn",
+            value = current_player.mention,
         )
 
         embed.set_image(
@@ -57,8 +57,8 @@ class Greetings(commands.Cog):
         )
 
         embed.set_footer(
-			text = "Enter 'exit' to exit the game"
-		)
+            text = "Enter 'exit' to exit the game"
+        )
 
         return embed
 
