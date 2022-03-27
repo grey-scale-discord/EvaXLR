@@ -68,10 +68,9 @@ def rules_embed():
 
 	return embed
 
-def guess_movie_embed(guess_movie, chances_left, is_wrong = False, is_correct = False):
+def guess_movie_embed(guess_movie, chances_left, is_wrong = False, is_correct = False, history = []):
 	guess_movie_name = "".join([ char["char"] if not char["is_blank"] else "_" for char in guess_movie ])
 	actual_movie_name = "".join([ char["char"] for char in guess_movie ])
-
 
 	digit_count = 0
 	alpha_count = 0
@@ -100,6 +99,13 @@ def guess_movie_embed(guess_movie, chances_left, is_wrong = False, is_correct = 
 		inline = True
 	)
 
+	if len(history):
+		embed.add_field(
+			name = "📋 Previous Guesses",
+			value = f"```" + ", ".join(history) + "```",
+			inline = False
+		)
+
 	embed.set_footer(
 		text = "Enter 'exit' to exit the game"
 	)
@@ -121,6 +127,9 @@ class Game:
 			{"char": char, "is_blank": False}
 				for char in movie
 		]
+		history = []
+
+		print(movie)
 
 		# Starting the game
 		total_chances = 15
@@ -137,19 +146,38 @@ class Game:
 				)
 				guess_letter = guess_letter.content.lower()
 
+				# Is exit command
+				if guess_letter in ["exit", "quit", "stop", "end", "$exit"]:
+					await ctx.send("Let's play again next time!")
+					break
+
+				# Is single character?
+				if len(guess_letter) != 1:
+					await ctx.send("Enter a single character!")
+					continue
+
+				history.append(guess_letter)
+
 				# Checking if the attempt is correct
 				is_correct = False
+				match_indices = []
 				value_index = 0
+
 				for char in guess_movie:
 					if guess_letter == char["char"] and char["is_blank"]:
-						guess_movie[value_index]["is_blank"] = False
 						is_correct = True
-						break
+						match_indices.append(value_index)
 					value_index += 1
 
+				# Correct Answer
 				if is_correct:
-					await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_correct = True))
-					
+					total_chances += 1
+
+					for index in match_indices:
+						guess_movie[index]["is_blank"] = False
+
+					await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_correct = True, history = history))
+
 					# Is game won?
 					if all(not char["is_blank"] for char in guess_movie):
 						await ctx.send(f"You won the game! The movie was {movie}")
@@ -158,25 +186,15 @@ class Game:
 					
 					continue
 
-				# Is exit command
-				if guess_letter in ["exit", "quit", "stop", "end", "$exit"]:
-					await ctx.send("Let's play again next time!")
-					break
-
 				# Is chances over?
 				if total_chances <= 0:
-					await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_wrong = True))
+					await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_wrong = True, history = history))
 					await ctx.send(f"You lost the game! The movie was {movie}")
 					break
-
-				# Is single character?
-				if len(guess_letter) != 1:
-					await ctx.send("Enter a single character!")
-					continue
 				
 				# Wrong Guess
 				total_chances -= 1
-				await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_wrong = True))
+				await ctx.send(embed = guess_movie_embed(guess_movie, total_chances, is_wrong = True, history = history))
 
 			except asyncio.TimeoutError:
 				await ctx.send("Time's up!")
