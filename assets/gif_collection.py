@@ -1,0 +1,19 @@
+gifs = [
+	"https://i.pinimg.com/originals/09/9a/57/099a57d2fe430ea56cdc5ed4979ff909.gif",
+	"https://i.pinimg.com/originals/9b/da/90/9bda90c406615bfb08c1deee5eac12f0.gif",
+	"https://i.pinimg.com/originals/5a/4b/42/5a4b42b5f67ad5ff2ee40e05b9f6791b.gif",
+	"https://i.pinimg.com/originals/74/51/d6/7451d6db75d6ee321bfc88dcba21d157.gif",
+	"https://i.pinimg.com/originals/fe/0e/21/fe0e21af0db0b29c33a866d16b7e5392.gif",
+	"https://pa1.narvii.com/6085/f1c0e054e6cf2215ee577b19b49f0ff575eccd6f_hq.gif",
+	"https://thumbs.gfycat.com/TightDeliciousCurassow-size_restricted.gif",
+	"https://c.tenor.com/P7VCJlbT_bAAAAAC/anime-pink.gif",
+	"https://c.tenor.com/-hvLFXU487AAAAAC/anime-pink.gif",
+	"https://i.pinimg.com/originals/94/fa/4b/94fa4b126901a1a2b79951f0a62d6a6c.gif",
+	"https://media0.giphy.com/media/GEkAU4EckSumA/200.gif?cid=95b279446d9d7ba976690f7ce405d6f4785e967a75f2ba75&rid=200.gif&ct=g",
+	"https://c.tenor.com/cQAPfeSNRlYAAAAC/aesthetic-japan.gif",
+	"https://thumbs.gfycat.com/IllfatedGreenBison-size_restricted.gif",
+	"https://data.whicdn.com/images/354225933/original.gif",
+	"https://data.whicdn.com/images/350786973/original.gif",
+	"https://i.pinimg.com/originals/f5/6c/8b/f56c8bcf538d1ed7ee1a959f4a643173.gif",
+	"https://data.whicdn.com/images/355689898/original.gif"
+]
