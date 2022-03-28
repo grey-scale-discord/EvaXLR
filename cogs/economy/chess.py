@@ -17,6 +17,7 @@ class Chess(commands.Cog):
         })
         return f"https://fen2png.com/api/?{params}"
     
+    # For future use
     def progress_bar_url(self, progress, total):
         white_progress = progress
         black_progress = total - progress
