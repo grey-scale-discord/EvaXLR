@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import asyncio
 load_dotenv()
 
-class Greetings(commands.Cog):
+class Chess(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -83,6 +83,7 @@ class Greetings(commands.Cog):
         is_win = False
         while not is_win:
             try:
+                # Accept input (chess san)
                 san = await self.bot.wait_for(
                     "message" , 
                     check = lambda m: m.author == current_player and m.channel == ctx.channel, 
@@ -112,6 +113,7 @@ class Greetings(commands.Cog):
                     )
                     break
 
+                # Toggle the current player and send the updated board
                 current_player = players[0] if current_player == players[1] else players[1]
                 await ctx.send(
                     embed = self.chess_board_embed(
@@ -135,4 +137,4 @@ class Greetings(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Greetings(bot))
+    bot.add_cog(Chess(bot))
