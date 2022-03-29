@@ -23,7 +23,7 @@ class ttt(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		
-    @client.command()
+    @commands.command(aliases = ["ttt" , "tic-tac-toe"])
     async def tictactoe(ctx, p1: discord.Member, p2: discord.Member):
         global count
         global player1
@@ -64,7 +64,7 @@ class ttt(commands.Cog):
         else:
             await ctx.send("A game is already in progress! Finish it before starting a new one.")
 
-    @client.command()
+    @commands.command()
     async def place(ctx, pos: int):
         global turn
         global player1
