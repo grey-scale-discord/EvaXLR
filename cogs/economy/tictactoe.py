@@ -20,9 +20,9 @@ winningConditions = [
     [2, 4, 6]
 ]
 class TicTacToe(commands.Cog):
-	def __init__(self, bot):
-		self.bot = bot
-		
+    def __init__(self, bot):
+        self.bot = bot
+        
     @commands.command(aliases = ["ttt" , "tictactoe"])
     async def _tic_tac_toe(ctx, p1: discord.Member, p2: discord.Member):
         global count
@@ -135,6 +135,5 @@ class TicTacToe(commands.Cog):
             await ctx.send("Please enter a position you would like to mark.")
         elif isinstance(error, commands.BadArgument):
             await ctx.send("Please make sure to enter an integer.")
-
 def setup(bot):
-	bot.add_cog(TicTacToe(bot))
+    bot.add_cog(TicTacToe(bot))
