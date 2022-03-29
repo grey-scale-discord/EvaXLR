@@ -19,12 +19,12 @@ winningConditions = [
     [0, 4, 8],
     [2, 4, 6]
 ]
-class ttt(commands.Cog):
+class TicTacToe(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		
-    @commands.command(aliases = ["ttt" , "tic-tac-toe"])
-    async def tictactoe(ctx, p1: discord.Member, p2: discord.Member):
+    @commands.command(aliases = ["ttt" , "tictactoe"])
+    async def _tic_tac_toe(ctx, p1: discord.Member, p2: discord.Member):
         global count
         global player1
         global player2
@@ -64,8 +64,8 @@ class ttt(commands.Cog):
         else:
             await ctx.send("A game is already in progress! Finish it before starting a new one.")
 
-    @commands.command()
-    async def place(ctx, pos: int):
+    @commands.command(aliases = ["p" , "place"])
+    async def _place(ctx, pos: int):
         global turn
         global player1
         global player2
@@ -121,7 +121,7 @@ class ttt(commands.Cog):
             if board[condition[0]] == mark and board[condition[1]] == mark and board[condition[2]] == mark:
                 gameOver = True
 
-    @tictactoe.error
+    @_tic_tac_toe.error
     async def tictactoe_error(ctx, error):
         print(error)
         if isinstance(error, commands.MissingRequiredArgument):
@@ -129,7 +129,7 @@ class ttt(commands.Cog):
         elif isinstance(error, commands.BadArgument):
             await ctx.send("Please make sure to mention/ping players (ie. <@688534433879556134>).")
 
-    @place.error
+    @_place.error
     async def place_error(ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Please enter a position you would like to mark.")
@@ -137,4 +137,4 @@ class ttt(commands.Cog):
             await ctx.send("Please make sure to enter an integer.")
 
 def setup(bot):
-	bot.add_cog(ttt(bot))
+	bot.add_cog(TicTacToe(bot))
