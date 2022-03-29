@@ -19,7 +19,10 @@ winningConditions = [
     [0, 4, 8],
     [2, 4, 6]
 ]
-class ttt:
+class ttt(commands.Cog):
+	def __init__(self, bot):
+		self.bot = bot
+		
     @client.command()
     async def tictactoe(ctx, p1: discord.Member, p2: discord.Member):
         global count
@@ -134,4 +137,4 @@ class ttt:
             await ctx.send("Please make sure to enter an integer.")
 
 def setup(bot):
-	bot.add_cog(Greetings(bot))
+	bot.add_cog(ttt(bot))
