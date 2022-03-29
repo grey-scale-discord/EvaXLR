@@ -24,7 +24,7 @@ class TicTacToe(commands.Cog):
         self.bot = bot
         
     @commands.command(aliases = ["ttt" , "tictactoe"])
-    async def _tic_tac_toe(ctx, p1: discord.Member, p2: discord.Member):
+    async def _tic_tac_toe(self, ctx, p1: discord.Member, p2: discord.Member):
         global count
         global player1
         global player2
@@ -65,7 +65,7 @@ class TicTacToe(commands.Cog):
             await ctx.send("A game is already in progress! Finish it before starting a new one.")
 
     @commands.command(aliases = ["p" , "place"])
-    async def _place(ctx, pos: int):
+    async def _place(self, ctx, pos: int):
         global turn
         global player1
         global player2
@@ -94,7 +94,7 @@ class TicTacToe(commands.Cog):
                         else:
                             line += " " + board[x]
 
-                    checkWinner(winningConditions, mark)
+                    self.checkWinner(winningConditions, mark)
                     print(count)
                     if gameOver == True:
                         await ctx.send(mark + " wins!")
@@ -115,14 +115,14 @@ class TicTacToe(commands.Cog):
             await ctx.send("Please start a new game using the !tictactoe command.")
 
 
-    def checkWinner(winningConditions, mark):
+    def checkWinner(self, winningConditions, mark):
         global gameOver
         for condition in winningConditions:
             if board[condition[0]] == mark and board[condition[1]] == mark and board[condition[2]] == mark:
                 gameOver = True
 
     @_tic_tac_toe.error
-    async def tictactoe_error(ctx, error):
+    async def tictactoe_error(self, ctx, error):
         print(error)
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Please mention 2 players for this command.")
@@ -130,7 +130,7 @@ class TicTacToe(commands.Cog):
             await ctx.send("Please make sure to mention/ping players (ie. <@688534433879556134>).")
 
     @_place.error
-    async def place_error(ctx, error):
+    async def place_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Please enter a position you would like to mark.")
         elif isinstance(error, commands.BadArgument):
