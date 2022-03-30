@@ -9,6 +9,7 @@ def get_afk_data():
 		users = json.load(f)
 	return users
 
+
 class Afk(commands.Cog):
 	def __init__(self , bot):
 		self.author = None
@@ -19,16 +20,17 @@ class Afk(commands.Cog):
 		try:
 			users = get_afk_data()
 
-			users[str(ctx.author.name)] = {}
-			users[str(ctx.author.name)]["user_id"] = ctx.author.id
-			users[str(ctx.author.name)]["reason"] = reason if reason!= None else None
+			_id = f"<@!{ctx.author.id}>"
+			users[str(_id)] = {}
+			users[str(_id)]["user_name"] = ctx.author.name
+			users[str(_id)]["reason"] = reason if reason!= None else None
 
 			with open("cogs/moderation/afklist.json" , "w") as f:
 				json.dump(users , f , indent = 2)
 
 			await ctx.send(f" {ctx.author.mention} ``is now Afk``- {reason}")
 			self.initial = time.time()
-			self.author = ctx.author
+			self._id = _id
 			self.reason = reason
 
 		except discord.errors.Forbidden:
@@ -38,29 +40,31 @@ class Afk(commands.Cog):
 	async def on_message(self , message):
 		users = get_afk_data()
 
-		if message.author.name in users and "afk" not in message.content:
-			self.final = time.time()
+		re_id = f"<@!{message.author.id}>"
+		if str(re_id) in users.keys() and "afk" not in message.content:
 
-			time_afk_seconds = (self.final - self.initial)
+			final = time.time()
+			time_afk_seconds = (final - self.initial)
 
-			if time_afk_seconds > 60 :
+			if time_afk_seconds >= 60 and time_afk_seconds < 3600:
 				time_afk = f"{round(time_afk_seconds / 60)} Minutes"
-			elif time_afk_seconds > 3600 :
+			elif time_afk_seconds >= 3600:
 				time_afk = f"{round(time_afk_seconds / 3600)} Hours"
 			else:
 				time_afk = f"{round(time_afk_seconds)} Seconds"
 
-			del users[str(self.author.name)]
+			del users[str(self._id)]
 
 			with open("cogs/moderation/afklist.json", "w") as f:
 				json.dump(users, f, indent=2)
 
-			await message.channel.send(f"Welcome!{message.author.mention} You were afk for {time_afk}")
+			await message.channel.send(f"Welcome! {message.author.mention} You were Afk for {time_afk}")
 
-		mention = f"<@!{self.author.id}>"
-		print(mention)
-		if mention in message.content and self.author.name in users:
-			await message.channel.send(f"{self.author.name}`` is Afk`` - {self.reason} ")
+		mention = [f"<@!{key}>" for key in users.keys()]
+
+		for _mention in mention:
+			if _mention in message.content:
+				await message.channel.send(f'{users[str(_mention)]["user_id"]}`` is Afk`` - {users[str(key)]["reason"]} ')
 
 def setup(bot):
 	bot.add_cog(Afk(bot))
