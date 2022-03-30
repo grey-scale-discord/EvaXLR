@@ -46,7 +46,7 @@ class Afk(commands.Cog):
 			if str(_mention) in message.content and "afk" not in message.content.lower():
 				await message.channel.send(f'<@{_mention}>`` is Afk`` - {users[str(_mention)]["reason"]} ')
 
-		if str(message.author.id) in users.keys() and "afk" not in message.content:
+		if str(message.author.id) in mention and "afk" not in message.content.lower():
 
 			final = time.time()
 			time_afk_seconds = (final - self.initial)
@@ -58,7 +58,7 @@ class Afk(commands.Cog):
 			else:
 				time_afk = f"{round(time_afk_seconds)} Seconds"
 
-			del users[str(self.author.id)]
+			del users[(str(message.author.id))]
 
 			with open("cogs/moderation/afklist.json", "w") as f:
 				json.dump(users, f, indent=2)
