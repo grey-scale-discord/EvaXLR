@@ -16,7 +16,7 @@ class Afk(commands.Cog):
 		self.bot = bot
 
 	@commands.command(aliases = ["afk"])
-	async def _afk(self , ctx , reason = None):
+	async def _afk(self , ctx ,*, reason = None):
 		try:
 			users = get_afk_data()
 
